@@ -27,6 +27,29 @@ from qgis.core import *
 
 from tools_network import getProxy
 
+import numpy as np
+
+
+def qimage2array(qimg):
+    """ Converting QImage to an array in numpy.
+        chanel map: 0=>B 1=>G 2=>R 3=>A
+        index is height x width
+    """
+    qimg = qimg.convertToFormat(QImage.Format_ARGB32)
+    shape = (qimg.height(), qimg.width(), 4)
+    dtype = np.uint8
+    buf = qimg.bits().asstring(qimg.numBytes())
+    return np.frombuffer(buf, dtype).reshape(shape).copy()
+
+
+def array2qimage(arr):
+    """ Convert the 3d matrix back to QImage.
+        chanel map: 0=>B 1=>G 2=>R 3=>A
+        index is height x width
+    """
+    h, w, c = arr.shape
+    return QImage(arr.data, w, h, QImage.Format_ARGB32).convertToFormat(QImage.Format_ARGB32_Premultiplied)
+
 
 debuglevel = 4  # 0 (none) - 4 (all)
 
@@ -281,6 +304,8 @@ class OpenlayersRenderer(QgsMapLayerRenderer):
         self.context = context
         self.controller = OpenlayersController(None, context, webPage, layerType)
         self.loop = None
+        self.enableGrayscale = layer.enableGrayscale
+        self.grayscaleWeights = layer.grayscaleWeights
 
     def render(self):
         """ do the rendering. This function is called in the worker thread """
@@ -302,6 +327,11 @@ class OpenlayersRenderer(QgsMapLayerRenderer):
         debug("[WORKER THREAD] Async request finished", 3)
 
         painter = self.context.painter()
+        if self.enableGrayscale:
+            debug('[WORKER THREAD] Rendering in grayscale', 3)
+            arr = qimage2array(self.controller.img)
+            arr[:,:,:3] = (np.dot(arr[:,:,:3], self.grayscaleWeights) / np.sum(self.grayscaleWeights)).reshape(arr.shape[:2] + (1,)).astype(np.uint8)
+            self.controller.img = array2qimage(arr)
         painter.drawImage(0, 0, self.controller.img)
         return True
 
@@ -328,12 +358,16 @@ class OpenlayersLayer(QgsPluginLayer):
 
         #self.iface = iface
         self.olWebPage = OLWebPage(self)
+        self.enableGrayscale = False
+        self.grayscaleWeights = np.array([.1, .6, .3])
 
     def readXml(self, node):
         # handle ol_layer_type idx stored in layer node (OL plugin <= 1.1.2)
         ol_layer_type_idx = int(node.toElement().attribute("ol_layer_type", "-1"))
         if ol_layer_type_idx != -1:
             self.layerType = self.olLayerTypeRegistry.getById(ol_layer_type_idx)
+        self.enableGrayscale = (int(node.toElement().attribute("enableGrayscale")) == 1)
+        self.grayscaleWeights = np.array([float(x) for x in node.toElement().attribute("grayscaleWeights").split(";")])
         return True
 
     def writeXml(self, node, doc):
@@ -341,6 +375,8 @@ class OpenlayersLayer(QgsPluginLayer):
         # write plugin layer type to project (essential to be read from project)
         element.setAttribute("type", "plugin")
         element.setAttribute("name", OpenlayersLayer.LAYER_TYPE)
+        element.setAttribute("enableGrayscale", 1 if self.enableGrayscale else 0)
+        element.setAttribute("grayscaleWeights", "%s;%s;%s" % tuple(self.grayscaleWeights))
         return True
 
     def setLayerType(self, layerType):
