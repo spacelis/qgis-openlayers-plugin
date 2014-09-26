@@ -19,6 +19,7 @@ email                : pka at sourcepole.ch
  *                                                                         *
  ***************************************************************************/
 """
+from PyQt4.QtCore import qDebug
 from qgis.core import QgsPluginLayerType
 from openlayers_layer import OpenlayersLayer
 
@@ -37,4 +38,14 @@ class OpenlayersPluginLayerType(QgsPluginLayerType):
         return layer
 
     def showLayerProperties(self, layer):
-        return False
+        qDebug('Property window called')
+        from layerproperty_dialog import LayerPropertyDialog
+        dlgLayerProperty = LayerPropertyDialog(layer)
+        dlgLayerProperty.show()
+        dlgLayerProperty.exec_()
+        self.applyPropertyChange(dlgLayerProperty, layer)
+        return True
+
+    def applyPropertyChange(self, dlg, layer):
+        layer.enableGrayscale = dlg.enableGrayscale
+        layer.grayscaleWeights = dlg.grayscaleWeights

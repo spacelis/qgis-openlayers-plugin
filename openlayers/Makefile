@@ -40,7 +40,7 @@ PY_FILES = __init__.py
 
 EXTRAS = openlayers.png 
 
-UI_FILES = ui_about_dialog.py ui_openlayers_ovwidget.py
+UI_FILES = ui_about_dialog.py ui_openlayers_ovwidget.py ui_openlayers_layerproperty_dialog.py
 
 RESOURCE_FILES = resources_rc.py
 

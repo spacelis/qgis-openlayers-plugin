@@ -113,9 +113,15 @@ class OpenlayersPlugin:
         self.iface.removePluginWebMenu("_tmp", self._actionAbout)
 
         # Register plugin layer type
-        pluginLayerType = OpenlayersPluginLayerType(self.iface, self.setReferenceLayer,
+        self.pluginLayerType = OpenlayersPluginLayerType(self.iface, self.setReferenceLayer,
                                                     self._olLayerTypeRegistry)
-        QgsPluginLayerRegistry.instance().addPluginLayerType(pluginLayerType)
+        QgsPluginLayerRegistry.instance().addPluginLayerType(self.pluginLayerType)
+        self.checkPluginLayerType()
+
+    def checkPluginLayerType(self):
+        qDebug('[OPENLAYERS] openlayers -> ' + QgsPluginLayerRegistry.instance().pluginLayerType('openlayers').__module__)
+        qDebug('[OPENLAYERS] types -> ' + str(QgsPluginLayerRegistry.instance().pluginLayerTypes()))
+
 
     def unload(self):
         self.iface.webMenu().removeAction(self._olMenu.menuAction())
