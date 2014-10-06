@@ -43,9 +43,6 @@ class OpenlayersPluginLayerType(QgsPluginLayerType):
         dlgLayerProperty = LayerPropertyDialog(layer)
         dlgLayerProperty.show()
         dlgLayerProperty.exec_()
-        self.applyPropertyChange(dlgLayerProperty, layer)
+        # FIXME need to rerender the map when the property dialog is closed
         return True
 
-    def applyPropertyChange(self, dlg, layer):
-        layer.enableGrayscale = dlg.enableGrayscale
-        layer.grayscaleWeights = dlg.grayscaleWeights

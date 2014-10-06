@@ -54,6 +54,9 @@
       <property name="enabled">
        <bool>false</bool>
       </property>
+      <property name="minimum">
+       <double>0.100000000000000</double>
+      </property>
       <property name="maximum">
        <double>1.000000000000000</double>
       </property>
@@ -77,6 +80,9 @@
       <property name="enabled">
        <bool>false</bool>
       </property>
+      <property name="minimum">
+       <double>0.100000000000000</double>
+      </property>
       <property name="maximum">
        <double>1.000000000000000</double>
       </property>
@@ -99,6 +105,9 @@
      <widget class="QDoubleSpinBox" name="dsbBlue">
       <property name="enabled">
        <bool>false</bool>
+      </property>
+      <property name="minimum">
+       <double>0.100000000000000</double>
       </property>
       <property name="maximum">
        <double>1.000000000000000</double>
@@ -127,15 +136,15 @@
    <sender>dialogButtonBox</sender>
    <signal>accepted()</signal>
    <receiver>dlgLayerProperty</receiver>
-   <slot>accept()</slot>
+   <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>220</x>
+     <y>265</y>
     </hint>
     <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
+     <x>199</x>
+     <y>149</y>
     </hint>
    </hints>
   </connection>
@@ -143,15 +152,15 @@
    <sender>dialogButtonBox</sender>
    <signal>rejected()</signal>
    <receiver>dlgLayerProperty</receiver>
-   <slot>reject()</slot>
+   <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>220</x>
+     <y>265</y>
     </hint>
     <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
+     <x>199</x>
+     <y>149</y>
     </hint>
    </hints>
   </connection>
