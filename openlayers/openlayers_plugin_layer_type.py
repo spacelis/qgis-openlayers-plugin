@@ -43,9 +43,6 @@ class OpenlayersPluginLayerType(QgsPluginLayerType):
         dlgLayerProperty = LayerPropertyDialog(layer)
         dlgLayerProperty.show()
         dlgLayerProperty.exec_()
-        self.applyPropertyChange(dlgLayerProperty, layer)
+        self.iface.mapCanvas().mapRenderer().render()
         return True
 
-    def applyPropertyChange(self, dlg, layer):
-        layer.enableGrayscale = dlg.enableGrayscale
-        layer.grayscaleWeights = dlg.grayscaleWeights
